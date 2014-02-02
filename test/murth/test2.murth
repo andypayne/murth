@@ -1,0 +1,12 @@
+
+baz = () -> {
+  if 3 > 5 then
+    false
+  else
+    true
+  end
+}
+
+baz()
+
+

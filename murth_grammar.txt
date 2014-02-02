@@ -1,0 +1,84 @@
+
+<exprs> = "" | (<newline> [<ws>] expr | expr) ( <line-term> [<ws>] expr )* [<ws>] [<line-term>]
+
+
+<expr> = ( comment | if-expr | dict-elem | add-sub | range | array | dictionary | string | str-concat | comprehension | eq-expr | lt-expr | lte-expr | gt-expr | gte-expr | and-expr | or-expr | let-expr | param-list | fn-call-expr | fn-def-expr | fn-assn-expr | <ws> )
+<rexpr> = ( if-expr | add-sub | array | dictionary | dict-elem | string | fn-call-expr | <'('> ( eq-expr | lt-expr | lte-expr | gt-expr | gte-expr | and-expr | or-expr ) <')'> | <ws> )
+<paren-rexpr> = <'('> ( eq-expr | lt-expr | lte-expr | gt-expr | gte-expr | and-expr | or-expr ) <')'>
+<rexpr2> = (eq-expr | lt-expr | lte-expr | gt-expr | gte-expr | rexpr | paren-rexpr)
+
+
+let-expr = [<ws>] <'let'> <ws> identifier [<ws>] <'='> [<ws>] expr [<ws>]
+
+
+if-expr = [<ws>] <'if'> <ws> (boolean / expr) <ws> then-expr [<newline>] ( else-expr | elsif-expr )? [<newline>]
+then-expr = (<'then'> | <'{'>) (<ws> | [<ws>] <newline>) [<ws>] (boolean / exprs) (<ws> | [<ws>] <newline> [<ws>]) ( <'end'> | <'}'> | &'else' | &'elsif' )
+else-expr = (<'else'> | [<ws>] <'else'> <ws> <'{'> ) (<ws> | [<ws>] <newline>) [<ws>] (boolean / exprs) (<ws> | [<ws>] <newline> [<ws>]) (<'end'> | <'}'>)
+elsif-expr = [<ws>] <'elsif'> <ws> (boolean / expr) <ws> then-expr [<newline>] ( else-expr | elsif-expr )? [<newline>]
+
+
+fn-call-expr = [<ws>] identifier param-list
+fn-a-expr = [<ws>] identifier [<ws>] <'='> [<ws>] param-list [<ws>] <'->'> [<ws>] block
+fn-assn-expr = [<ws>] identifier [<ws>] <'='> [<ws>] fn-def-expr
+fn-def-expr = [<ws>] param-list [<ws>] <'->'> [<ws>] block
+block = <'{'> exprs <'}'>
+param-list = [<ws>] <'('> [<nlws>] [expr [<nlws>]] (<','> [<nlws>] expr [<nlws>])* <')'>
+
+
+eq-expr = [<ws>] rexpr [<ws>] <'=='> [<ws>] (boolean / rexpr)
+neq-expr = [<ws>] rexpr [<ws>] <'!='> [<ws>] (boolean / rexpr)
+lt-expr = [<ws>] rexpr [<ws>] <'<'> [<ws>] (boolean / rexpr)
+lte-expr = [<ws>] rexpr [<ws>] <'<='> [<ws>] rexpr
+gt-expr = [<ws>] rexpr [<ws>] <'>'> [<ws>] rexpr
+gte-expr = [<ws>] rexpr [<ws>] <'>='> [<ws>] rexpr
+and-expr = rexpr2 <ws> <'and'> <ws> rexpr2
+or-expr = rexpr2 <ws> <'or'> <ws> rexpr2
+
+
+array = [<ws>] <'['> [<nlws>] [expr [<nlws>]] (<','> [<nlws>] expr [<nlws>])* <']'>
+string = [<ws>] <'"'> chars <'"'> [<ws>]
+chars = #'[^"]*'
+range = [<ws>] <'['> [<nlws>] add-sub [<nlws>] <'..'> [<nlws>] add-sub [<nlws>] [<','> [<nlws>] range-step] [<nlws>] <']'>
+range-step = number
+dictionary = [<ws>] <'{'> [<nlws>] [dict-keyval [<nlws>]] (<','> [<nlws>] dict-keyval [<nlws>])* <'}'>
+dict-keyval = dict-key [<ws>] <':'> [<ws>] dict-val
+<dict-key> = identifier
+<dict-val> = expr
+dict-elem = identifier <'.'> ( identifier | fn-call-expr )
+
+
+comprehension = [<ws>] <'['> [<nlws>] expr [<nlws>] <'|'> comp-generator [<nlws>] ( [<nlws>] <','> [<nlws>] comp-generator [<nlws>] )* <']'> [<ws>]
+comp-generator = [<nlws>] identifier [<nlws>] <'<-'> [<nlws>] (range | array) [<nlws>]
+
+
+str-concat = (string | fn-call-expr) <'++'> (string | fn-call-expr | str-concat) [<ws>]
+
+
+<add-sub> = [<ws>] (mul-div | mod | add | sub | expo ) [<ws>]
+mod = add-sub <'%'> mul-div
+add = add-sub <'+'> mul-div [<ws>]
+sub = add-sub <'-'> mul-div
+expo = add-sub <'^'> mul-div
+<mul-div> = [<ws>] (term | mul | div | fn-call-expr) [<ws>]
+mul = mul-div <'*'> term
+div = mul-div <'/'> term
+<term> = [<ws>] (number | identifier | fn-call-expr | dict-elem | <'('> add-sub <')'>) [<ws>]
+
+
+identifier = !reserved-word keyword
+<keyword> = #'[a-zA-Z][a-zA-Z0-9_]*'
+<reserved-word> = ('if' | 'then' | 'elsif' | 'else' | 'end' | 'and' | 'or' | 'true' | 'false')
+boolean = 'true' | 'false'
+number = #'-?[0-9]+(\.[0-9]+)?'
+
+
+comment = [<ws>] <'#'> [<ws>] comment-chars [newline]
+<comment-chars> = #'.*'
+
+
+blank-line = [<ws>] #'\n'
+nlws = #'\s+'
+ws = #'[ \t]+'
+newline = #'\n'
+line-term = (#'\n+' | ';')
+
