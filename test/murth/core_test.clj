@@ -394,3 +394,15 @@
                                       odds_under(10)")))
   ))
 
+
+(deftest test-dictionary-parameters
+  (testing "Testing Dictionary Parameters"
+    (is (= 11
+           (murth-eval "f1 = (h) -> {
+                          1 + h.one
+                        }
+                        f1({zero: 0, one: 10})
+                        ")))
+  ))
+
+
