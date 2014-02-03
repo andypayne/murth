@@ -176,17 +176,29 @@
           (vec (map (partial murth-eval-s acc) (rest xp)))))
 
 
+(defn internal-dict-fn [acc dict fname params]
+  (match [fname]
+         [:key?] (let [k (keyword (murth-eval-s acc params))]
+                   (contains? dict k))))
+
+
 (defn process-dict-elem [acc xp]
   (let [dict       (murth-eval-s acc (nth xp 1))
         elem-id    (nth xp 2)
         elem-t     (if (= :fn-call-expr (first elem-id))
                      (let [fname    (murth-eval-s acc (nth elem-id 1))
                            pparams  (rest (nth elem-id 2))
-                           fdef     (get dict fname)
+                           fdef     (match [fname]
+                                           [:key?]  {:type  :internal_function
+                                                     :name  :key?}
+                                           :else    (get dict fname))
+
                            fbody    (get fdef :body)
                            fparams  (get fdef :params)
                            facc (assoc acc :_locals (into {} (map (fn [f p] (vector f (murth-eval-s acc p))) fparams pparams)))]
-                       (murth-eval-s facc (rest fbody)))
+                       (if (= :internal_function (get fdef :type))
+                         (internal-dict-fn facc dict (get fdef :name) pparams)
+                         (murth-eval-s facc (rest fbody))))
                      (get dict (murth-eval-s acc elem-id)))]
     elem-t))
 

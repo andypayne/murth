@@ -301,7 +301,23 @@
                                                       two:   2,
                                                       three: \"threve\" }
                                             d.three")))
-    ))
+    (is (= true
+           (murth-eval "let h = {
+                          one: 1,
+                          two: 2,
+                          three: 3
+                        }
+                        h.key?(\"two\")
+                        ")))
+    (is (= false
+           (murth-eval "let h = {
+                          one: 1,
+                          two: 2,
+                          three: 3
+                        }
+                        h.key?(\"nope\")
+                        ")))
+  ))
 
 
 (deftest test-string-ops
