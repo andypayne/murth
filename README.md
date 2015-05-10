@@ -9,15 +9,15 @@ $ lein uberjar
 
 ## Usage
 
-$ murth
+		$ murth
 		Options:
-         -h, --help          Display this help.
-         -i, --repl          Start a repl.
-         -f, --file <file>   Run source file <file>.
+		         -h, --help          Display this help.
+		         -i, --repl          Start a repl.
+		         -f, --file <file>   Run source file <file>.
 
 Example:
 
-$ murth -f test/murth/test2.murth
+		$ murth -f test/murth/test2.murth
 		Args: ("-f" "test/murth/test2.murth")
 		true
 
