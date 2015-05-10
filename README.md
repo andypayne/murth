@@ -10,7 +10,7 @@ $ lein uberjar
 ## Usage
 
 $ murth
-Options:
+	Options:
          -h, --help          Display this help.
          -i, --repl          Start a repl.
          -f, --file <file>   Run source file <file>.
@@ -18,8 +18,8 @@ Options:
 Example:
 
 $ murth -f test/murth/test2.murth
-Args: ("-f" "test/murth/test2.murth")
-true
+	Args: ("-f" "test/murth/test2.murth")
+	true
 
 ## License
 
