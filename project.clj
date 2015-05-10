@@ -7,4 +7,5 @@
                  [org.clojure/math.numeric-tower "0.0.2"]
                  [org.clojure/core.match "0.2.0"]
                  [instaparse "1.2.2"]]
-  :main murth.core)
+  :main murth.core
+  :aot [murth.core])
